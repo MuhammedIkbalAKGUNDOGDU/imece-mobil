@@ -15,5 +15,8 @@ Text customText(
       fontSize: size ?? Theme.of(context).textTheme.bodyMedium!.fontSize,
       fontWeight: weight,
     ),
+    maxLines: 2,
+    overflow: TextOverflow.ellipsis,
+    textAlign: TextAlign.center,
   );
 }
