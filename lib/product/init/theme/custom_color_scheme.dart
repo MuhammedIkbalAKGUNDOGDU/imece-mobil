@@ -38,7 +38,7 @@ final class CustomColorScheme {
     onPrimaryFixedVariant: Color(0xff285021),
     secondaryFixed: Color(0xffd7e8cd),
     onSecondaryFixed: Color(0xff121f0e),
-    secondaryFixedDim: Color(0xffbbcbb2),
+    secondaryFixedDim: Color.fromRGBO(238, 238, 238, 1),
     onSecondaryFixedVariant: Color(0xff3c4b37),
     tertiaryFixed: Color(0xffbcebee),
     onTertiaryFixed: Color(0xff002022),

@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: CustomLightTheme().themeData,
       darkTheme: CustomDarkTheme().themeData,
       themeMode: ThemeMode.light,
-      initialRoute: '/messaging',
+      initialRoute: '/home',
       routes: appRoutes,
     );
   }
