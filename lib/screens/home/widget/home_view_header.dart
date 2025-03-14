@@ -1,13 +1,15 @@
 part of '../home_screen.dart';
 
-class _HomeHeaderAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _HomeHeaderAppBar({super.key});
+class HomeHeaderAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const HomeHeaderAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-        backgroundColor: HomeStyle(context: context).surface,
-        title: TextField(
+      backgroundColor: HomeStyle(context: context).surface,
+      title: Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: TextField(
           decoration: InputDecoration(
             hintText: 'Arat...',
             hintStyle: TextStyle(color: HomeStyle(context: context).outline),
@@ -36,9 +38,11 @@ class _HomeHeaderAppBar extends StatelessWidget implements PreferredSizeWidget {
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 10.0);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 5.0);
 }

@@ -6,6 +6,7 @@ Text customText(
   Color? color,
   double? size, // Sadece width değeri kullanıldığı için height'a gerek yok
   FontWeight weight = FontWeight.normal,
+  int maxLines = 1,
 }) {
   final effectiveColor = color ?? Theme.of(context).colorScheme.primary;
   return Text(
@@ -15,7 +16,7 @@ Text customText(
       fontSize: size ?? Theme.of(context).textTheme.bodyMedium!.fontSize,
       fontWeight: weight,
     ),
-    maxLines: 2,
+    maxLines: maxLines,
     overflow: TextOverflow.ellipsis,
     textAlign: TextAlign.center,
   );

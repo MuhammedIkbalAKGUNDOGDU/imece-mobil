@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:imecehub/screens/home/home_screen.dart';
-import 'package:imecehub/screens/messaging/messaging_view.dart';
-import 'package:imecehub/screens/messaging/private/messaging_private_screen.dart';
-import 'package:imecehub/screens/order/order_screen.dart';
+import 'package:imecehub/screens/profil/messaging/messaging_view.dart';
+import 'package:imecehub/screens/profil/messaging/private/messaging_private_screen.dart';
+import 'package:imecehub/screens/shoppingCart/order_screen.dart';
 import 'package:imecehub/screens/profil/addPost/addPost_screen.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
