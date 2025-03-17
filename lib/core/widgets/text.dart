@@ -4,18 +4,20 @@ Text customText(
   String text,
   BuildContext context, {
   Color? color,
-  double? size, // Sadece width değeri kullanıldığı için height'a gerek yok
+  double? size,
   FontWeight weight = FontWeight.normal,
   int maxLines = 1,
+  TextDecoration decoration = TextDecoration.none,
 }) {
   final effectiveColor = color ?? Theme.of(context).colorScheme.primary;
   return Text(
     text,
     style: TextStyle(
-      color: effectiveColor,
-      fontSize: size ?? Theme.of(context).textTheme.bodyMedium!.fontSize,
-      fontWeight: weight,
-    ),
+        color: effectiveColor,
+        fontSize: size ?? Theme.of(context).textTheme.bodyMedium!.fontSize,
+        fontWeight: weight,
+        decoration: decoration,
+        decorationColor: effectiveColor),
     maxLines: maxLines,
     overflow: TextOverflow.ellipsis,
     textAlign: TextAlign.center,
