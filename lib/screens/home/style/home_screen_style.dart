@@ -12,9 +12,12 @@ final class HomeStyle {
   Color get secondaryFixedDim =>
       Theme.of(_context).colorScheme.secondaryFixedDim;
   Color get shadow => Theme.of(_context).colorScheme.shadow;
+  Color get tertiary => Theme.of(_context).colorScheme.tertiary;
 
   TextStyle get appBarTextStyle => Theme.of(_context).textTheme.headlineMedium!;
   TextStyle get headlineSmall => Theme.of(_context).textTheme.headlineSmall!;
+  TextStyle get headlineMedium => Theme.of(_context).textTheme.headlineMedium!;
+  TextStyle get headlineLarge => Theme.of(_context).textTheme.headlineLarge!;
   TextStyle get bodyLarge => Theme.of(_context).textTheme.bodyLarge!;
   TextStyle get bodyMedium => Theme.of(_context).textTheme.bodyMedium!;
   TextStyle get bodySmall => Theme.of(_context).textTheme.bodySmall!;

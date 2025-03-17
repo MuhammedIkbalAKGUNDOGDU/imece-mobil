@@ -15,7 +15,7 @@ final class CustomColorScheme {
     onSecondary: Color(0xffffffff),
     secondaryContainer: Color(0xffd7e8cd),
     onSecondaryContainer: Color(0xff3c4b37),
-    tertiary: Color(0xff386569),
+    tertiary: Color.fromRGBO(61, 209, 61, 1),
     onTertiary: Color(0xffffffff),
     tertiaryContainer: Color(0xffbcebee),
     onTertiaryContainer: Color(0xff1e4d51),
