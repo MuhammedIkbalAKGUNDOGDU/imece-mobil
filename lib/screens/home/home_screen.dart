@@ -7,6 +7,7 @@ import 'package:imecehub/screens/home/home_screen_mixin.dart';
 import 'package:imecehub/screens/home/manager/home_manager.dart';
 import 'package:imecehub/screens/home/style/home_screen_style.dart';
 import 'package:imecehub/screens/products/products_screen.dart';
+import 'package:imecehub/screens/profil/profile_screen.dart';
 import 'package:imecehub/screens/shoppingCart/order_screen.dart';
 import 'package:imecehub/screens/profil/addPost/addPost_screen.dart';
 
@@ -40,9 +41,7 @@ class _HomeScreenState extends State<HomeScreen> with HomeScreenMixin {
               case 2:
                 return OrderScreen();
               default:
-                return Center(
-                  child: Text('Profilim'),
-                );
+                return ProfileScreen();
             }
           },
         )),
