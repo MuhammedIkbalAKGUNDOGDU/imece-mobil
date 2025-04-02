@@ -1,0 +1,10 @@
+{
+    "usersApiUrl": "https://imecehub.com/api/users/kullanicilar/",
+    "productsApiUrl":"https://imecehub.com/api/products/urunler/",
+    "populerProductsApiUrl":"https://imecehub.com/products/populer-urunler/",
+    "productsCategoryApiUrl":"https://imecehub.com/api/products/kategoriler/",
+    "categoriesApiUrl":"https://imecehub.com/api/products/kategoriler/?gorsel=false",
+    "companiesApiUrl":"https://imecehub.com/api/sirketler/",
+    "apiKey": "WNjZXNttoxNzM5Mzc3MDM3LCJpYXQiOUvKrIq06hpJl_1PenWgeKZw_7FMvL65DixY"
+  }
+  

@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:imecehub/core/widgets/productsCard.dart';
+import 'package:imecehub/core/widgets/container.dart';
+import 'package:imecehub/core/widgets/productsCard2.dart';
 import 'package:imecehub/core/widgets/shadow.dart';
+import 'package:imecehub/core/widgets/showTemporarySnackBar.dart';
 import 'package:imecehub/core/widgets/text.dart';
+import 'package:imecehub/core/widgets/textField.dart';
+import 'package:imecehub/models/companies.dart';
+import 'package:imecehub/models/productCategories.dart';
+import 'package:imecehub/models/products.dart';
+import 'package:imecehub/models/users.dart';
 import 'package:imecehub/screens/home/home_screen_mixin.dart';
 import 'package:imecehub/screens/home/manager/home_manager.dart';
 import 'package:imecehub/screens/home/style/home_screen_style.dart';
 import 'package:imecehub/screens/products/products_screen.dart';
 import 'package:imecehub/screens/profil/profile_screen.dart';
-import 'package:imecehub/screens/shoppingCart/order_screen.dart';
-import 'package:imecehub/screens/profil/addPost/addPost_screen.dart';
+import 'package:imecehub/screens/shoppingCart/cart_screen.dart';
+
+import '../../services/api_service.dart';
 
 part 'widget/home_view_header.dart';
 part 'widget/home_view_bottom.dart';

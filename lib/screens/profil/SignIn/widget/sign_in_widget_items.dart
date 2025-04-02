@@ -131,7 +131,7 @@ SizedBox orLine(
   );
 }
 
-Material NextButton(
+SizedBox NextButton(
   BuildContext context,
   bool isCheckedContract, {
   double? minSizeHeight,
