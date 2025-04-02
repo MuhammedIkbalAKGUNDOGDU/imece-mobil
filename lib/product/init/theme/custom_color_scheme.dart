@@ -28,7 +28,7 @@ final class CustomColorScheme {
     onSurfaceVariant: Color(0xff43483f),
     outline: Color(0xff73796e),
     outlineVariant: Color(0xffc3c8bc),
-    shadow: Color(0xff000000),
+    shadow: Color.fromARGB(255, 86, 36, 36),
     scrim: Color(0xff000000),
     inverseSurface: Color(0xff2e322b),
     inversePrimary: Color(0xffa5d396),
@@ -48,7 +48,7 @@ final class CustomColorScheme {
     surfaceBright: Color(0xfff8fbf1),
     surfaceContainerLowest: Color(0xffffffff),
     surfaceContainerLow: Color(0xfff2f5eb),
-    surfaceContainer: Color(0xffecefe5),
+    surfaceContainer: Color(0xffffffff),
     surfaceContainerHigh: Color(0xffe6e9e0),
     surfaceContainerHighest: Color(0xffe1e4da),
   );
