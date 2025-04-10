@@ -13,6 +13,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
+      resizeToAvoidBottomInset:
+          false, // Klavye açıldığında UI'nın kaymasını engeller
       appBar: SignInAppBar(context),
       body: SafeArea(
           child: Padding(

@@ -1,85 +1,124 @@
 part of '../products_screen.dart';
 
 class ProductsScreenBodyView extends StatefulWidget {
-  const ProductsScreenBodyView({super.key});
+  final String? categoryId;
+
+  const ProductsScreenBodyView({super.key, this.categoryId});
 
   @override
   State<ProductsScreenBodyView> createState() => _ProductsScreenBodyView();
 }
 
-class _ProductsScreenBodyView extends State<ProductsScreenBodyView> {
+class _ProductsScreenBodyView extends State<ProductsScreenBodyView>
+    with AutomaticKeepAliveClientMixin {
   List<dynamic> productCategories = [
     {'name': 'Sırala', 'icon': Icon(Icons.compare_arrows_outlined)},
     {'name': 'Filtrele', 'icon': Icon(Icons.filter_alt_outlined)},
     {'name': 'Satıcı', 'icon': Icon(Icons.home_filled)},
     {'name': 'Fiyat', 'icon': Icon(Icons.price_change_outlined)}
   ];
+  String notFoundImageUrl = 'https://www.halifuryasi.com/Upload/null.png';
+  // Statik cache değişkeni: Tüm örnekler arasında paylaşılır.
 
-  List<dynamic> products = [
-    {
-      'imagePath': [
-        'assets/image/aliciOl.png',
-        'assets/image/aliciOl.png',
-        'assets/image/aliciOl.png'
-      ],
-      'productName': 'Ürün Adı',
-      'rating': 5,
-      'description': 'Ürün açıklaması',
-      'price': 20,
-    },
-    {
-      'imagePath': ['assets/image/aliciOl.png', 'assets/image/aliciOl.png'],
-      'productName': 'Ürün Adı 2',
-      'rating': 4,
-      'description': 'Ürün açıklaması 2',
-      'price': 25,
-    },
-    {
-      'imagePath': ['assets/image/aliciOl.png'],
-      'productName': 'Ürün Adı 3',
-      'rating': 3,
-      'description': 'Ürün açıklaması 3',
-      'price': 30,
+  static List<Product>? cachedProducts;
+  late Future<List<Product>> _futureProducts;
+  @override
+  void initState() {
+    super.initState();
+    // Aşağıdaki kodu initState içine ekleyerek, eğer cachedProducts dolu ise
+    // API çağrısı yapmadan cache'den verileri kullanıyoruz.
+    if (cachedProducts != null && cachedProducts!.isNotEmpty) {
+      // Cache dolu ise: direkt veriyi Future.value ile sarıyoruz.
+      _futureProducts = Future.value(cachedProducts);
+    } else {
+      // İlk açılışta veya cache boşsa API’den verileri çek
+      _futureProducts = ApiService.fetchProducts(id: widget.categoryId)
+          as Future<List<Product>>;
+      _futureProducts.then((products) {
+        // Gelen veriyi cache'e atıyoruz.
+        cachedProducts = products;
+      });
     }
-  ];
+  }
+
+  // Refresh işlemini gerçekleştiren metod:
+  Future<void> _refreshProducts() async {
+    // API'den verileri çek ve cache'i güncelle
+    List<Product> freshProducts =
+        await ApiService.fetchProducts(id: widget.categoryId) as List<Product>;
+    setState(() {
+      cachedProducts = freshProducts;
+      _futureProducts = Future.value(freshProducts);
+    });
+  }
+
+  @override
+  bool get wantKeepAlive =>
+      true; // Ekran arası geçişte state’in korunmasını sağlar
 
   @override
   Widget build(BuildContext context) {
+    final themeData = HomeStyle(context: context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     Color filterButtonOnColor =
         HomeStyle(context: context).secondary.withOpacity(0.15);
-    return SafeArea(
-      left: false,
-      right: false,
-      top: false,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _categoryButtons(context, height),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _productCards(height, width),
-                  SizedBox(
-                    height: height * 0.12,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+    return RefreshIndicator(
+      color: themeData.secondary,
+      backgroundColor: Colors.white,
+      onRefresh: _refreshProducts,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            Builder(builder: (context) {
+              if (widget.categoryId == null) {
+                return _categoryButtons(context, height);
+              } else {
+                return SizedBox();
+              }
+            }),
+            _futureProductsItems(height, width),
+          ],
+        ),
       ),
     );
   }
 
-  GridView _productCards(double height, double width) {
+  FutureBuilder<List<Product>> _futureProductsItems(
+      double height, double width) {
+    return FutureBuilder<List<Product>>(
+      future: _futureProducts,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Veri bekleniyor, yükleniyor göstergesi göster
+          return Container(
+              margin: EdgeInsets.only(top: height * 0.5),
+              color: Colors.transparent);
+        } else if (snapshot.hasError) {
+          // Hata durumu
+          return Center(child: Text('Bir hata oluştu: ${snapshot.error}'));
+        } else {
+          // Veri başarıyla alındı
+
+          final products = snapshot.data!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              _productCards(height, width, products),
+              SizedBox(
+                height: height * 0.12,
+              )
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  GridView _productCards(double height, double width, products) {
     return GridView.builder(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           mainAxisExtent: height * 0.4,
           crossAxisCount: 2, // İki sütun
@@ -90,9 +129,11 @@ class _ProductsScreenBodyView extends State<ProductsScreenBodyView> {
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
-          final product = products[index];
           return productsCard(
-              product: product, width: width, context: context, height: height);
+              product: products[index],
+              width: width,
+              context: context,
+              height: height);
         });
   }
 

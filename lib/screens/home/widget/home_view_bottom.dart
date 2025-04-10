@@ -18,7 +18,7 @@ class _HomeBottomNavigationBarTest extends StatelessWidget {
           borderRadius:
               HomeStyle(context: context).bottomNavigationBarBorderRadius,
           child: BottomNavigationBar(
-            backgroundColor: HomeStyle(context: context).surface,
+            backgroundColor: HomeStyle(context: context).surfaceContainer,
             selectedItemColor: HomeStyle(context: context).secondary,
             unselectedItemColor: HomeStyle(context: context).primary,
             selectedLabelStyle: TextStyle(

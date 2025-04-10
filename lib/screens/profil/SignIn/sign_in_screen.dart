@@ -25,6 +25,8 @@ class _SignInScreen extends State<SignInScreen> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
+      resizeToAvoidBottomInset:
+          false, // Klavye açıldığında UI'nın kaymasını engeller
       appBar: SignInAppBar(context),
       body: SafeArea(
           child: Padding(

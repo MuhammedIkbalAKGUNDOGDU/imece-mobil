@@ -8,79 +8,242 @@ class _HomeViewBody extends StatefulWidget {
 }
 
 class _HomeViewBodyState extends State<_HomeViewBody> {
-  List categories = [
-    'Meyveler',
-    'Sebzeler',
-    'Yeşillikler ve otlar',
-    'Mantarlar',
-    'Kategori 5',
-    'Kategori 6',
-  ];
-  List saticilar = [
-    'Satıcı 1',
-    'Satıcı 2',
-    'Satıcı 3',
-    'Satıcı 4',
-    'Satıcı 5',
-    'Satıcı 6',
-  ];
+  static List<Category>? cachedCategories;
+  static List<Company>? cachedSellers;
+  static List<Product>? cachedPopulerProducts;
+  late Future<List<Category>> _futureCategory;
+  late Future<List<Company>> _futureSellers;
+  late Future<List<Product>> _futurePopulerProducts;
 
-  List<dynamic> products = [
-    {
-      'imagePath': [
-        'assets/image/aliciOl.png',
-        'assets/image/aliciOl.png',
-        'assets/image/aliciOl.png'
-      ],
-      'productName': 'Ürün Adı',
-      'rating': 5,
-      'description': 'Ürün açıklaması',
-      'price': 20,
-    },
-    {
-      'imagePath': ['assets/image/aliciOl.png', 'assets/image/aliciOl.png'],
-      'productName': 'Ürün Adı 2',
-      'rating': 4,
-      'description': 'Ürün açıklaması 2',
-      'price': 25,
-    },
-    {
-      'imagePath': ['assets/image/aliciOl.png'],
-      'productName': 'Ürün Adı 3',
-      'rating': 3,
-      'description': 'Ürün açıklaması 3',
-      'price': 30,
-    }
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _voidCachedCategories();
+    _voidCachedSellers();
+    _voidCachedPopulerProducts();
+  }
+
+  // Refresh işlemini gerçekleştiren metod:
+  Future<void> _refreshFutures() async {
+    // API'den verileri çek ve cache'i güncelle
+    List<Category> freshCategory =
+        await ApiService.fetchCategories() as List<Category>;
+    setState(() {
+      cachedCategories = freshCategory;
+      _futureCategory = Future.value(freshCategory);
+    });
+    List<Company> freshSellers =
+        await ApiService.fetchSellers() as List<Company>;
+    setState(() {
+      cachedSellers = freshSellers;
+      _futureSellers = Future.value(freshSellers);
+    });
+
+    List<Product> freshPopulerProducts =
+        await ApiService.fetchSellers() as List<Product>;
+    setState(() {
+      cachedPopulerProducts = freshPopulerProducts;
+      _futurePopulerProducts = Future.value(freshPopulerProducts);
+    });
+  }
 
   List kampanyalar = ['Kampanya 1', 'Kampanya 2', 'Kampanya 3'];
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+    final themeData = HomeStyle(context: context);
     return Scaffold(
       appBar: HomeHeaderAppBar(),
-      body: SafeArea(
-          child: Padding(
-              padding: HomeStyle(context: context).bodyPadding,
-              child: SingleChildScrollView(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                    _categoriesText(context),
-                    _categoriesItems(width, height),
-                    _kampanyalarText(context),
-                    _kampanyalarItems(width, height),
-                    _kayitContainer(context, height),
-                    _saticilarList(height, context, width),
-                    _alimTipiContainer(height, context),
-                    _populerUrunlerText(context),
-                    _populerUrunCards(width, height),
-                    _onerilerContainer(height, context, width),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.12,
-                    ),
-                  ])))),
+      body: RefreshIndicator(
+        color: themeData.secondary,
+        backgroundColor: Colors.white,
+        onRefresh: _refreshFutures,
+        child: SafeArea(
+            child: Padding(
+                padding: HomeStyle(context: context).bodyPadding,
+                child: SingleChildScrollView(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                      _futureCategories(width, height),
+                      _kampanyalarText(context),
+                      _kampanyalarItems(width, height),
+                      _kayitContainer(context, height),
+                      //_saticilarList(height, context, width),
+                      _futureSellersView(height, width, themeData),
+                      _alimTipiContainer(height, context),
+
+                      //_populerUrunCards(width, height),
+                      _futurePopulerProductsView(width, height),
+                      _onerilerContainer(height, context, width),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.12,
+                      ),
+                    ])))),
+      ),
+    );
+  }
+
+  Column _futurePopulerProductsView(double width, double height) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _populerUrunlerText(context),
+        FutureBuilder<List<Product>>(
+          future: _futurePopulerProducts,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Container(
+                  //margin: EdgeInsets.only(top: height * 0.5),
+                  color: Colors.transparent);
+            } else if (snapshot.hasError) {
+              return Text("Hata oluştu: ${snapshot.error}");
+            } else if (snapshot.hasData) {
+              List<Product> populerProducts = snapshot.data!;
+
+              return _populerUrunCards(width, height, populerProducts);
+            } else {
+              return Text("Veri bulunamadı");
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  SizedBox _futureSellersView(double height, double width, themeData) {
+    return SizedBox(
+      height: height * 0.14,
+      child: FutureBuilder<List<Company>>(
+        future: _futureSellers,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Column(
+              children: [
+                Container(
+                    //margin: EdgeInsets.only(top: height * 0.5),
+                    color: Colors.transparent),
+              ],
+            );
+          } else if (snapshot.hasError) {
+            return container(context,
+                color: themeData.surfaceContainer,
+                borderRadius: BorderRadius.circular(8),
+                isBoxShadow: true,
+                margin: EdgeInsets.only(bottom: 15),
+                padding: EdgeInsets.all(8),
+                child: customText("Hata oluştu: ${snapshot.error}", context,
+                    color: themeData.secondary));
+          } else if (snapshot.hasData) {
+            double saticiContainerWidth = width * 0.2;
+            double avatarContainerHeight = 87;
+            List<Company> sellers = snapshot.data!;
+
+            return _sellerList(
+                sellers, avatarContainerHeight, saticiContainerWidth);
+          } else {
+            return Text("Veri bulunamadı");
+          }
+        },
+      ),
+    );
+  }
+
+  ListView _sellerList(List<Company> sellers, double avatarContainerHeight,
+      double saticiContainerWidth) {
+    return ListView.builder(
+      itemCount: sellers.length,
+      scrollDirection: Axis.horizontal,
+      itemBuilder: (context, index) {
+        double containerHeight = sellers[index].adi.length < 12
+            ? avatarContainerHeight * 0.5
+            : avatarContainerHeight * 0.3;
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              showTemporarySnackBar(context, 'onPressed ${sellers[index].adi}');
+            });
+          },
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 5),
+            width: saticiContainerWidth,
+            height: containerHeight,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                    backgroundColor: HomeStyle(context: context).secondary,
+                    child: SvgPicture.network(
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.person_outline_sharp);
+                      },
+                      sellers[index].logo,
+                      fit: BoxFit.cover,
+                    )),
+                customText(
+                  '${sellers[index].adi}',
+                  context,
+                  maxLines: 2,
+                  softWrap: true,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Column _futureCategories(double width, double height) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _categoriesText(context),
+        SizedBox(
+          height: height * 0.14,
+          child: FutureBuilder<List<Category>>(
+            future: _futureCategory,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Container(
+                    //margin: EdgeInsets.only(top: height * 0.5),
+                    color: Colors.transparent);
+              } else if (snapshot.hasError) {
+                return Text("Hata oluştu: ${snapshot.error}");
+              } else if (snapshot.hasData) {
+                List<Category> categories = snapshot.data!;
+
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    //final category = categories[index];
+
+                    return Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          right: index == categories.length - 1 ? 0 : 8,
+                        ),
+                        child: _categories(categories[index], width, height),
+                      ),
+                    );
+                  },
+                );
+              } else {
+                return Text("Veri bulunamadı");
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -164,7 +327,7 @@ class _HomeViewBodyState extends State<_HomeViewBody> {
     );
   }
 
-  Widget _populerUrunCards(double width, double height) {
+  Widget _populerUrunCards(double width, double height, populerProducts) {
     return GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           mainAxisExtent: height * 0.4,
@@ -172,12 +335,13 @@ class _HomeViewBodyState extends State<_HomeViewBody> {
           crossAxisSpacing: 10, // Sütunlar arası yatay boşluk
           mainAxisSpacing: 10, // Satırlar arası dikey boşluk
         ),
-        itemCount: products.length,
+        itemCount: populerProducts.length,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
-          final product = products[index];
-          return productsCard(
+          final product = populerProducts[index];
+          print(product);
+          return productsCard2(
               product: product, width: width, context: context, height: height);
         });
   }
@@ -328,24 +492,6 @@ class _HomeViewBodyState extends State<_HomeViewBody> {
     );
   }
 
-  SizedBox _categoriesItems(double width, double height) {
-    return SizedBox(
-      height: height * 0.135,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: EdgeInsets.only(
-              right: index == categories.length - 1 ? 0 : 8,
-            ),
-            child: _categories(categories[index], width, height),
-          );
-        },
-      ),
-    );
-  }
-
   Padding _categoriesText(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -353,67 +499,6 @@ class _HomeViewBodyState extends State<_HomeViewBody> {
           size: HomeStyle(context: context).bodyLarge.fontSize,
           weight: FontWeight.bold,
           color: HomeStyle(context: context).primary),
-    );
-  }
-
-  Container _saticilarList(double height, BuildContext context, double width) {
-    double saticiContainerWidth = width * 0.2;
-    double avatarContainerHeight = height * 0.13;
-    return Container(
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-      ),
-      width: double.infinity, // Ekran genişliğini kaplar
-      height: avatarContainerHeight,
-      child: Expanded(
-        child: ListView.builder(
-          itemCount: saticilar.length,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) {
-            return Container(
-              margin: EdgeInsets.symmetric(horizontal: 5),
-              width: saticiContainerWidth,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircleAvatar(
-                      child: Image.asset(
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(Icons.person_outline_sharp);
-                    },
-                    'assets/icon/profil.svg',
-                    fit: BoxFit.cover,
-                  )),
-                  Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            onError: (exception, stackTrace) {
-                              Builder(
-                                builder: (context) {
-                                  return Icon(Icons.person_outline_sharp);
-                                },
-                              );
-                            },
-                            image: AssetImage('assets/icon/profil.svg'),
-                            fit: BoxFit.cover)),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '${saticilar[index]}',
-                      maxLines: 2,
-                      softWrap: true,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow
-                          .ellipsis, // Metin taşarsa sonuna "..." ekler
-                    ),
-                  )
-                ],
-              ),
-            );
-          },
-        ),
-      ),
     );
   }
 
@@ -522,27 +607,39 @@ class _HomeViewBodyState extends State<_HomeViewBody> {
     );
   }
 
-  Column _categories(dynamic category, double width, double height) {
+  Column _categories(Category category, double width, double height) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 5,
       children: [
-        Container(
-          width: width * 0.25,
-          height: height * 0.1,
-          decoration: BoxDecoration(
-            boxShadow: [
-              boxShadow(context),
-            ],
-            borderRadius:
-                HomeStyle(context: context).bodyCategoryContainerBorderRadius,
-            image: const DecorationImage(
-              image: AssetImage('assets/image/grupalim.jpg'),
-              fit: BoxFit.cover,
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              Navigator.pushNamed(context, '/home/category',
+                  arguments: category.kategoriId);
+            });
+          },
+          child: Container(
+            width: width * 0.20,
+            height: height * 0.08,
+            decoration: BoxDecoration(
+              boxShadow: [
+                boxShadow(context),
+              ],
+              borderRadius:
+                  HomeStyle(context: context).bodyCategoryContainerBorderRadius,
+              image: DecorationImage(
+                image: NetworkImage(category.gorsel),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),
-        customText(category, context,
+        customText(category.altKategoriAdi, context,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            color: HomeStyle(context: context).primary,
             size: HomeStyle(context: context).bodyLarge.fontSize)
       ],
     );
@@ -572,5 +669,51 @@ class _HomeViewBodyState extends State<_HomeViewBody> {
                 size: HomeStyle(context: context).headlineSmall.fontSize),
           ]),
     );
+  }
+
+  void _voidCachedCategories() {
+    //_futureCategory = ApiService.fetchCategories() as Future<List<Category>>;
+    // Aşağıdaki kodu initState içine ekleyerek, eğer cachedProducts dolu ise
+    // API çağrısı yapmadan cache'den verileri kullanıyoruz.
+    if (cachedCategories != null && cachedCategories!.isNotEmpty) {
+      // Cache dolu ise: direkt veriyi Future.value ile sarıyoruz.
+      _futureCategory = Future.value(cachedCategories);
+    } else {
+      // İlk açılışta veya cache boşsa API’den verileri çek
+      _futureCategory = ApiService.fetchCategories() as Future<List<Category>>;
+      _futureCategory.then((categories) {
+        // Gelen veriyi cache'e atıyoruz.
+        cachedCategories = categories;
+      });
+    }
+  }
+
+  void _voidCachedSellers() {
+    if (cachedSellers != null && cachedSellers!.isNotEmpty) {
+      // Cache dolu ise: direkt veriyi Future.value ile sarıyoruz.
+      _futureSellers = Future.value(cachedSellers);
+    } else {
+      // İlk açılışta veya cache boşsa API’den verileri çek
+      _futureSellers = ApiService.fetchSellers() as Future<List<Company>>;
+      _futureSellers.then((sellers) {
+        // Gelen veriyi cache'e atıyoruz.
+        cachedSellers = sellers;
+      });
+    }
+  }
+
+  void _voidCachedPopulerProducts() {
+    if (cachedPopulerProducts != null && cachedPopulerProducts!.isNotEmpty) {
+      // Cache dolu ise: direkt veriyi Future.value ile sarıyoruz.
+      _futurePopulerProducts = Future.value(cachedPopulerProducts);
+    } else {
+      // İlk açılışta veya cache boşsa API’den verileri çek
+      _futurePopulerProducts =
+          ApiService.fetchPopulerProducts() as Future<List<Product>>;
+      _futurePopulerProducts.then((populerProducts) {
+        // Gelen veriyi cache'e atıyoruz.
+        cachedPopulerProducts = populerProducts;
+      });
+    }
   }
 }

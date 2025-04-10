@@ -13,6 +13,7 @@ final class HomeStyle {
       Theme.of(_context).colorScheme.secondaryFixedDim;
   Color get shadow => Theme.of(_context).colorScheme.shadow;
   Color get tertiary => Theme.of(_context).colorScheme.tertiary;
+  Color get surfaceContainer => Theme.of(_context).colorScheme.surfaceContainer;
 
   TextStyle get appBarTextStyle => Theme.of(_context).textTheme.headlineMedium!;
   TextStyle get headlineSmall => Theme.of(_context).textTheme.headlineSmall!;
@@ -25,7 +26,7 @@ final class HomeStyle {
 
   EdgeInsets get appBarPadding => const EdgeInsets.symmetric(horizontal: 20);
   EdgeInsets get bottomNavigationBarPadding =>
-      const EdgeInsets.symmetric(horizontal: 20, vertical: 10);
+      const EdgeInsets.symmetric(horizontal: 10, vertical: 10);
   EdgeInsets get bodyPadding => const EdgeInsets.symmetric(horizontal: 10);
 
   BorderRadius get bottomNavigationBarBorderRadius =>
